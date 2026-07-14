@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="/summer-study/">
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="暑期提分 - 学习计划">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="暑期提分">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="icon" type="image/png" href="favicon.png"/>
+  <title>暑期提分</title>
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <div id="__msg" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:18px;font-family:Microsoft YaHei;z-index:99999;background:#fff;padding:30px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.15);text-align:center">
+    <p>📚 正在准备数据...</p>
+  </div>
+  <script>
+    // 首次打开自动导入杨田安暑期计划
+    (function(){
+      // 尝试两种 key 前缀
+      var P = 'flutter.';
+      if(localStorage.getItem(P+'seed_data_imported')){document.getElementById('__msg').innerHTML='<p>✅ 数据已就绪</p>'; return;}
+      var n=new Date().toISOString(),t=n.split('T')[0],e=new Date(Date.now()+56*86400000).toISOString().split('T')[0];
+      var u=function(){return'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){var r=Math.random()*16|0;return (c=='x'?r:r&0x3|0x8).toString(16)})};
+      var a=[],b=[];
+      var d=[
+        {t:'📐 数学强化',d:'有理数运算→整式加减→一元一次方程→几何初步。每天20道计算题，错题整理到错题本',s:'数学',k:[['上午：数学基础学习（看课本例题→盖住答案自己写）',90],['上午：20道计算题（限时20分钟）',20],['晚上：数学强化训练+错题重做',90],['整理错题本（错因+解法+同类题1道）',15]]},
+        {t:'🔤 英语突破',d:'每天背15个新词+复习旧词。攻克48个音标，七上课文，语法，初二预习',s:'英语',k:[['早晨：英语晨读（大声朗读课文20分钟）',30],['上午：背15个新单词+音标学习',45],['上午：语法学习（每学一个语法造5个句子）',30],['晚上：单词滚动复习（艾宾浩斯记忆法）',30],['碎片时间：英语听力磨耳朵',15]]},
+        {t:'📚 语文提升',d:'古诗文逐篇背诵默写，每天1篇现代文阅读，每周1篇作文。阅读名著',s:'语文',k:[['下午：古诗文背诵默写（七上+七下逐篇过关）',20],['下午：现代文阅读1篇（总结答题模板）',30],['下午：文言文字词解释+翻译练习',20],['阅读《朝花夕拾》或《西游记》30分钟',30]]},
+        {t:'🧬 生物复习',d:'七上：细胞结构、生态系统。七下：人体各系统。画图理解',s:'生物',k:[['下午：生物课本复习（画图：细胞/人体系统）',40],['整理生物知识点笔记（结构→功能）',20]]},
+        {t:'📖 小科轮换背诵',d:'周一/四历史（画时间轴），周二/五地理（看地图），周三/六政治（答题套路）',s:'综合',k:[['上午：小科轮换学习（历史/地理/政治每日一科）',45],['周六：本周小科知识点回顾+抽背检查',30]]},
+        {t:'📝 每日必修习惯',d:'错题整理、当日复习、早睡早起。周日休息日灵活安排',s:'综合',k:[['下午：当日复习（回顾当天所有科目所学内容）',30],['晚上：背诵类知识回顾（闭眼复述才算过）',15],['晚9:30前洗漱准备就寝',5],['晚10:00熄灯睡觉（保证8小时+睡眠）',5]]}
+      ];
+      d.forEach(function(p){
+        var pi=u();a.push({id:pi,title:p.t,description:p.d,type:'daily',subject:p.s,startDate:t,endDate:e,createdAt:n,isActive:1});
+        p.k.forEach(function(x,i){b.push({id:u(),planId:pi,title:x[0],subject:p.s,estimatedMinutes:x[1],isCompletedToday:0,completedAt:null,sortOrder:i,createdAt:n})});
+      });
+      try{
+        // 写多种前缀，确保 Flutter 能读到
+        ['flutter.','','flutter_'].forEach(function(pre){
+          localStorage.setItem(pre+'storage_plans',JSON.stringify(a));
+          localStorage.setItem(pre+'storage_tasks',JSON.stringify(b));
+          localStorage.setItem(pre+'storage_completion_logs','[]');
+        });
+        localStorage.setItem(P+'seed_data_imported','true');
+        document.getElementById('__msg').innerHTML='<p>✅ 数据已注入，刷新试试</p><small>如果还是空白，按F12截图控制台给我</small>';
+      }catch(e){document.getElementById('__msg').innerHTML='<p>❌ '+e+'</p>'}
+    })();
+  </script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

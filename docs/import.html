@@ -1,0 +1,31 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8"><title>导入</title></head>
+<body style="font-family:Microsoft YaHei;text-align:center;margin-top:80px;background:#f0f4ff">
+<h1>📚 暑期提分</h1>
+<h2>一键导入杨田安暑期计划</h2>
+<button onclick="go()" style="font-size:22px;padding:20px 60px;background:#4A90D9;color:#fff;border:none;border-radius:16px;cursor:pointer">🚀 点击导入</button>
+<div id="m" style="margin-top:20px;font-size:18px"></div>
+<script>
+function uid(){return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{var r=Math.random()*16|0;return(c=='x'?r:r&0x3|0x8).toString(16)})}
+function go(){
+var n=new Date().toISOString(),t=n.split('T')[0],e=new Date(Date.now()+56*86400000).toISOString().split('T')[0];
+var plans=[],tasks=[];
+var data=[
+{t:'📐 数学强化',d:'有理数运算→整式加减→一元一次方程→几何初步',s:'数学',k:[['上午：数学基础学习',90],['20道计算题',20],['晚上：数学强化训练+错题重做',90],['整理错题本',15]]},
+{t:'🔤 英语突破',d:'每天背15个新词+复习旧词',s:'英语',k:[['早晨：英语晨读朗读20分钟',30],['背15个新单词+音标',45],['语法学习+造句',30],['晚上：单词滚动复习',30],['碎片时间听力磨耳朵',15]]},
+{t:'📚 语文提升',d:'古诗文背诵+现代文阅读+作文',s:'语文',k:[['古诗文背诵默写',20],['现代文阅读1篇',30],['文言文翻译练习',20],['名著阅读30分钟',30]]},
+{t:'🧬 生物复习',d:'细胞、生态系统、人体系统',s:'生物',k:[['生物课本复习画图理解',40],['整理知识点笔记',20]]},
+{t:'📖 小科轮换背诵',d:'历史/地理/政治每日轮换',s:'综合',k:[['小科轮换学习',45],['周六回顾+抽背',30]]},
+{t:'📝 每日必修习惯',d:'错题整理、复习、早睡早起',s:'综合',k:[['当日复习回顾',30],['背诵知识回顾',15],['晚9:30洗漱就寝',5],['晚10:00熄灯睡觉',5]]}
+];
+data.forEach(p=>{
+var pi=uid();plans.push({id:pi,title:p.t,description:p.d,type:'daily',subject:p.s,startDate:t,endDate:e,createdAt:n,isActive:1});
+p.k.forEach((x,i)=>tasks.push({id:uid(),planId:pi,title:x[0],subject:p.s,estimatedMinutes:x[1],isCompletedToday:0,completedAt:null,sortOrder:i,createdAt:n}));
+});
+localStorage.setItem('flutter.storage_plans',JSON.stringify(plans));
+localStorage.setItem('flutter.storage_tasks',JSON.stringify(tasks));
+localStorage.setItem('flutter.storage_completion_logs','[]');
+localStorage.setItem('flutter.seed_data_imported','true');
+document.getElementById('m').innerHTML='✅ 导入成功！<br><a href="./">← 返回 App 查看</a>';
+}
+</script>
+</body></html>
