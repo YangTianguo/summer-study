@@ -4,33 +4,15 @@
   <base href="/summer-study/">
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="暑期提分 - 学习计划与家长控制">
+  <meta name="description" content="暑期提分 - 学习计划">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="暑期提分">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
   <link rel="icon" type="image/png" href="favicon.png"/>
   <title>暑期提分</title>
   <link rel="manifest" href="manifest.json">
-  <style>
-    #loading{position:fixed;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#f0f4ff;font-family:-apple-system,"Microsoft YaHei",sans-serif;z-index:9999}
-    .spinner{width:48px;height:48px;border:4px solid #e0e0e0;border-top-color:#4A90D9;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:20px}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .title{font-size:22px;font-weight:bold;color:#333;margin-bottom:6px}
-    .subtitle{font-size:14px;color:#999}
-  </style>
 </head>
 <body>
-  <div id="loading">
-    <div class="spinner"></div>
-    <div class="title">📚 暑期提分</div>
-    <div class="subtitle">加载中，请稍候...</div>
-  </div>
-  <script>
-    window.addEventListener('flutter-first-frame',function(){var el=document.getElementById('loading');if(el)el.remove()});
-    window.addEventListener('error',function(e){if(e.target&&e.target.tagName==='SCRIPT'){var el=document.getElementById('loading');if(el)el.innerHTML='<div style="font-size:18px;color:#e53935">⚠️ 加载失败</div><div style="font-size:14px;color:#999;margin-top:8px">请检查网络后刷新重试</div>'}},true);
-    setTimeout(function(){var el=document.getElementById('loading');if(el){var s=el.querySelector('.subtitle');if(s)s.textContent='首次加载约3MB，请耐心等待...'}},10000);
-  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
