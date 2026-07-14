@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/plan_provider.dart';
 import '../providers/parent_control_provider.dart';
+import '../services/plan_importer.dart';
+import '../services/seed_data.dart';
 import '../widgets/task_tile.dart';
 import 'add_plan_screen.dart';
 
@@ -38,6 +40,49 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
         actions: [
+          // 导入按钮
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.file_upload_outlined),
+            tooltip: '导入计划',
+            onSelected: (value) {
+              if (value == 'paste') {
+                _showImportDialog(context);
+              } else if (value == 'demo') {
+                _importDemoData(context);
+              } else if (value == 'sample') {
+                _downloadSample(context);
+              }
+            },
+            itemBuilder: (ctx) => [
+              const PopupMenuItem(
+                value: 'paste',
+                child: ListTile(
+                  leading: Icon(Icons.paste),
+                  title: Text('粘贴 JSON 导入'),
+                  subtitle: Text('从剪贴板粘贴计划数据', style: TextStyle(fontSize: 12)),
+                  dense: true, contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'demo',
+                child: ListTile(
+                  leading: Icon(Icons.rocket_launch),
+                  title: Text('加载杨田安暑期计划'),
+                  subtitle: Text('一键导入完整的暑期提升计划', style: TextStyle(fontSize: 12)),
+                  dense: true, contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'sample',
+                child: ListTile(
+                  leading: Icon(Icons.download),
+                  title: Text('下载示例 JSON 文件'),
+                  subtitle: Text('下载模板，修改后导入', style: TextStyle(fontSize: 12)),
+                  dense: true, contentPadding: EdgeInsets.zero,
+                ),
+              ),
+            ],
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: '刷新',
@@ -336,6 +381,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final theme = Theme.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(40),
@@ -345,25 +391,36 @@ class HomeScreen extends StatelessWidget {
             Icon(
               Icons.menu_book_rounded,
               size: 80,
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
+              color: theme.colorScheme.primary.withValues(alpha: 0.4),
             ),
             const SizedBox(height: 20),
             Text(
               '还没有学习计划',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+              style: theme.textTheme.titleLarge?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
             ),
             const SizedBox(height: 8),
             Text(
-              '点击下方按钮创建你的第一个学习计划\n设定每日任务，开始暑期提分之旅！',
+              '创建计划或导入已有计划文件',
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 24),
+            // 一键导入按钮
             FilledButton.icon(
+              onPressed: () => _importDemoData(context),
+              icon: const Icon(Icons.rocket_launch),
+              label: const Text('📋 加载杨田安暑期计划'),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(280, 48),
+              ),
+            ),
+            const SizedBox(height: 12),
+            // 手动创建
+            OutlinedButton.icon(
               onPressed: () {
                 Navigator.push(
                   context,
@@ -373,7 +430,20 @@ class HomeScreen extends StatelessWidget {
                 });
               },
               icon: const Icon(Icons.add),
-              label: const Text('创建学习计划'),
+              label: const Text('手动创建计划'),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size(280, 48),
+              ),
+            ),
+            const SizedBox(height: 12),
+            // 粘贴导入
+            OutlinedButton.icon(
+              onPressed: () => _showImportDialog(context),
+              icon: const Icon(Icons.paste),
+              label: const Text('粘贴 JSON 导入'),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size(280, 44),
+              ),
             ),
           ],
         ),
@@ -394,5 +464,178 @@ class HomeScreen extends StatelessWidget {
       default:
         return const Color(0xFF607D8B);
     }
+  }
+
+  // ==================== 导入功能 ====================
+
+  /// 一键导入杨田安暑期计划
+  static void _importDemoData(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => const AlertDialog(
+        title: Text('正在导入...'),
+        content: Row(
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(width: 20),
+            Text('正在加载杨田安暑期提升计划...'),
+          ],
+        ),
+      ),
+    );
+
+    SeedDataService.importSeedData().then((_) {
+      if (context.mounted) {
+        Navigator.pop(context); // 关闭 loading
+        context.read<PlanProvider>().loadAll();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ 杨田安暑期计划已导入！\n6个计划、23个任务'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    }).catchError((e) {
+      if (context.mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('导入失败：$e')),
+        );
+      }
+    });
+  }
+
+  /// 粘贴 JSON 导入
+  static void _showImportDialog(BuildContext context) {
+    final controller = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.paste, size: 20),
+            SizedBox(width: 8),
+            Text('粘贴 JSON 导入'),
+          ],
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '将 JSON 格式的计划内容粘贴到下方：',
+                  style: TextStyle(fontSize: 13, color: Colors.grey),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: controller,
+                  maxLines: 10,
+                  decoration: const InputDecoration(
+                    hintText: '{\n  "plans": [...]\n}',
+                    border: OutlineInputBorder(),
+                    alignLabelWithHint: true,
+                  ),
+                  validator: (v) =>
+                      (v == null || v.trim().isEmpty) ? '请粘贴JSON内容' : null,
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () {
+              if (!formKey.currentState!.validate()) return;
+              final result = PlanImporter.parse(
+                controller.text.trim(),
+                'import.json',
+              );
+              if (!result.success) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(result.errorMessage ?? '格式错误')),
+                );
+                return;
+              }
+              _executeImport(context, result.plans, result.tasks);
+              Navigator.pop(ctx);
+            },
+            child: const Text('导入'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 下载示例 JSON
+  static void _downloadSample(BuildContext context) {
+    final json = PlanImporter.generateSampleJson();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('💡 示例已生成。请复制下方内容保存为 .json 文件后导入。'),
+        duration: Duration(seconds: 4),
+      ),
+    );
+    // 显示示例内容
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('📄 示例 JSON（可复制保存）'),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: 400,
+          child: SingleChildScrollView(
+            child: SelectableText(
+              json,
+              style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('关闭'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 执行导入
+  static void _executeImport(
+    BuildContext context,
+    List<Map<String, dynamic>> plans,
+    List<Map<String, dynamic>> tasks,
+  ) {
+    final provider = context.read<PlanProvider>();
+    final planCount = plans.length;
+
+    provider.batchImportPlans(plans, tasks).then((_) {
+      provider.loadAll();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('✅ 成功导入 $planCount 个计划！'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    }).catchError((e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('导入失败：$e')),
+        );
+      }
+    });
   }
 }

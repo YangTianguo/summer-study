@@ -191,4 +191,57 @@ class PlanProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  /// 批量导入计划（用于文件导入和种子数据）
+  Future<void> batchImportPlans(
+    List<Map<String, dynamic>> planDataList,
+    List<Map<String, dynamic>> taskDataList,
+  ) async {
+    final now = DateTime.now();
+
+    for (final planData in planDataList) {
+      final planId = _uuid.v4();
+      final plan = Plan(
+        id: planId,
+        title: planData['title']?.toString() ?? '未命名计划',
+        description: planData['description']?.toString() ?? '',
+        type: planData['type']?.toString() ?? 'daily',
+        subject: planData['subject']?.toString() ?? '综合',
+        startDate: planData['startDate'] is DateTime
+            ? planData['startDate'] as DateTime
+            : DateTime.tryParse(planData['startDate']?.toString() ?? '') ?? now,
+        endDate: planData['endDate'] is DateTime
+            ? planData['endDate'] as DateTime
+            : DateTime.tryParse(planData['endDate']?.toString() ?? '') ??
+                now.add(const Duration(days: 30)),
+        createdAt: now,
+      );
+      await _store.insertPlan(plan);
+
+      // 找到属于这个计划的任务（通过索引偏移匹配）
+      final planIndex = planDataList.indexOf(planData);
+      final taskCountPerPlan = planDataList.isNotEmpty
+          ? taskDataList.length ~/ planDataList.length
+          : 0;
+      final startIdx = planIndex * taskCountPerPlan;
+      final endIdx = startIdx + taskCountPerPlan;
+
+      for (int i = startIdx; i < endIdx && i < taskDataList.length; i++) {
+        final taskData = taskDataList[i];
+        final task = Task(
+          id: _uuid.v4(),
+          planId: planId,
+          title: taskData['title']?.toString() ?? '未命名任务',
+          subject: taskData['subject']?.toString() ?? plan.subject,
+          estimatedMinutes:
+              int.tryParse(taskData['estimatedMinutes']?.toString() ?? '30') ?? 30,
+          sortOrder: taskData['sortOrder'] as int? ?? i - startIdx,
+          createdAt: now,
+        );
+        await _store.insertTask(task);
+      }
+    }
+
+    await loadAll();
+  }
 }

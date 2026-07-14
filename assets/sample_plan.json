@@ -1,0 +1,85 @@
+{
+  "plans": [
+    {
+      "title": "📐 数学强化（每日约3小时）",
+      "subject": "数学",
+      "type": "daily",
+      "description": "第一阶段：有理数运算 → 整式加减 → 一元一次方程 → 几何初步。每天先做20道计算题，错题必须整理到错题本。",
+      "startDate": "2026-07-14",
+      "endDate": "2026-09-08",
+      "tasks": [
+        {"title": "上午：数学基础学习（看课本例题→盖住答案自己写→对照批改）", "estimatedMinutes": 90, "subject": "数学"},
+        {"title": "上午：20道计算题（限时20分钟）", "estimatedMinutes": 20, "subject": "数学"},
+        {"title": "晚上：数学强化训练 + 错题重做", "estimatedMinutes": 90, "subject": "数学"},
+        {"title": "整理错题本（每道错题写：错因+正确解法+同类题1道）", "estimatedMinutes": 15, "subject": "数学"}
+      ]
+    },
+    {
+      "title": "🔤 英语突破（每日约2.5小时）",
+      "subject": "英语",
+      "type": "daily",
+      "description": "每天背15个新词+复习旧词。第1-3周攻克音标，第1-4周七上课文，第5-6周七下+语法，第7-8周初二预习。",
+      "startDate": "2026-07-14",
+      "endDate": "2026-09-08",
+      "tasks": [
+        {"title": "早晨：英语晨读（大声朗读课文/单词20分钟）", "estimatedMinutes": 30, "subject": "英语"},
+        {"title": "上午：背15个新单词 + 音标学习", "estimatedMinutes": 45, "subject": "英语"},
+        {"title": "上午：语法学习（每学一个语法造5个句子）", "estimatedMinutes": 30, "subject": "英语"},
+        {"title": "晚上：单词滚动复习（艾宾浩斯记忆法）", "estimatedMinutes": 30, "subject": "英语"},
+        {"title": "碎片时间：英语听力磨耳朵（午餐/晚餐时播放课文录音）", "estimatedMinutes": 15, "subject": "英语"}
+      ]
+    },
+    {
+      "title": "📚 语文提升（每日1.5小时）",
+      "subject": "语文",
+      "type": "daily",
+      "description": "古诗文逐篇背诵默写，每天1篇现代文阅读，每周1篇作文。阅读《朝花夕拾》《西游记》。",
+      "startDate": "2026-07-14",
+      "endDate": "2026-09-08",
+      "tasks": [
+        {"title": "下午：古诗文背诵默写（七上+七下逐篇过关）", "estimatedMinutes": 20, "subject": "语文"},
+        {"title": "下午：现代文阅读1篇（做完对答案，总结答题模板）", "estimatedMinutes": 30, "subject": "语文"},
+        {"title": "下午：文言文字词解释+翻译练习", "estimatedMinutes": 20, "subject": "语文"},
+        {"title": "阅读《朝花夕拾》或《西游记》30分钟", "estimatedMinutes": 30, "subject": "语文"}
+      ]
+    },
+    {
+      "title": "🧬 生物复习（每日1小时）",
+      "subject": "生物",
+      "type": "daily",
+      "description": "七上：细胞结构、生态系统。七下：人体各系统。画图理解，用结构→功能逻辑串联。",
+      "startDate": "2026-07-14",
+      "endDate": "2026-09-08",
+      "tasks": [
+        {"title": "下午：生物课本复习（画图理解：细胞结构/人体系统）", "estimatedMinutes": 40, "subject": "生物"},
+        {"title": "整理生物知识点笔记（结构→功能串联）", "estimatedMinutes": 20, "subject": "生物"}
+      ]
+    },
+    {
+      "title": "📖 小科轮换背诵（每日45分钟）",
+      "subject": "综合",
+      "type": "daily",
+      "description": "周一/四历史（画时间轴），周二/五地理（看地图），周三/六政治（背知识点+答题套路）。周日休息。",
+      "startDate": "2026-07-14",
+      "endDate": "2026-09-08",
+      "tasks": [
+        {"title": "上午：小科轮换学习（历史/地理/政治每日一科）", "estimatedMinutes": 45, "subject": "综合"},
+        {"title": "周六：本周小科知识点回顾 + 抽背检查", "estimatedMinutes": 30, "subject": "综合"}
+      ]
+    },
+    {
+      "title": "📝 每日必修习惯",
+      "subject": "综合",
+      "type": "daily",
+      "description": "错题整理、当日复习、早睡早起。周日休息日可灵活安排。",
+      "startDate": "2026-07-14",
+      "endDate": "2026-09-08",
+      "tasks": [
+        {"title": "下午：当日复习（回顾当天所有科目所学内容）", "estimatedMinutes": 30, "subject": "综合"},
+        {"title": "晚上：背诵类知识回顾（闭眼复述才算过）", "estimatedMinutes": 15, "subject": "综合"},
+        {"title": "晚9:30前洗漱准备就寝", "estimatedMinutes": 5, "subject": "综合"},
+        {"title": "晚10:00熄灯睡觉（保证8小时+睡眠）", "estimatedMinutes": 5, "subject": "综合"}
+      ]
+    }
+  ]
+}
