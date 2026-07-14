@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>暑期提分</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Microsoft YaHei",sans-serif;background:#f0f4ff;color:#333}
+.app{max-width:500px;margin:0 auto;padding:16px}
+h1{text-align:center;font-size:22px;padding:16px 0 4px}
+.date{text-align:center;font-size:13px;color:#999;margin-bottom:16px}
+.card{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+.card h3{font-size:15px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.tag{font-size:11px;padding:2px 8px;border-radius:6px;font-weight:600}
+.tag-math{background:#e3f0ff;color:#4A90D9}.tag-eng{background:#fff0e8;color:#E8734A}
+.tag-chn{background:#e8f5e9;color:#388E3C}.tag-bio{background:#f3e5f5;color:#7B1FA2}
+.tag-other{background:#e8eaf6;color:#3949AB}
+.desc{font-size:12px;color:#999;margin-bottom:10px}
+.task{display:flex;align-items:center;padding:8px 0;border-bottom:1px solid #f5f5f5;cursor:pointer}
+.task:last-child{border-bottom:none}
+.task input[type=checkbox]{width:22px;height:22px;margin-right:12px;accent-color:#4A90D9;flex-shrink:0}
+.task span{flex:1;font-size:14px}
+.task .done{text-decoration:line-through;color:#bbb}
+.task .time{font-size:11px;color:#bbb;margin-left:8px;flex-shrink:0}
+.progress{display:flex;align-items:center;gap:12px;padding:8px 0}
+.progress-bar{flex:1;height:6px;background:#e0e0e0;border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:#4A90D9;border-radius:3px;transition:width .3s}
+.progress-txt{font-size:13px;font-weight:600;white-space:nowrap}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:500px;margin:0 auto;display:flex;background:#fff;border-top:1px solid #eee;padding:8px 0;padding-bottom:max(8px,env(safe-area-inset-bottom))}
+.nav-item{flex:1;text-align:center;font-size:12px;color:#999}
+.nav-item.active{color:#4A90D9}
+.actions{display:flex;gap:8px;margin-top:12px}
+.btn{flex:1;padding:12px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer}
+.btn-primary{background:#4A90D9;color:#fff}
+.btn-outline{background:#fff;color:#4A90D9;border:1.5px solid #4A90D9}
+.hidden{display:none!important}
+.stats-row{display:flex;gap:12px;margin-bottom:12px}
+.stats-card{flex:1;background:#fff;border-radius:14px;padding:14px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+.stats-card .num{font-size:28px;font-weight:bold}
+.stats-card .lbl{font-size:11px;color:#999;margin-top:2px}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <h1>📚 暑期提分</h1>
+  <div class="date" id="date"></div>
+  <div id="content"></div>
+</div>
+<div class="bottom-nav">
+  <div class="nav-item active" onclick="showTab(0)">📅 今日计划</div>
+  <div class="nav-item" onclick="showTab(1)">📊 统计</div>
+</div>
+
+<script>
+var P='summer_study_';
+var plans=[],tasks=[],logs=[],tab=0;
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,10)}
+
+function save(){localStorage.setItem(P+'plans',JSON.stringify(plans));localStorage.setItem(P+'tasks',JSON.stringify(tasks));localStorage.setItem(P+'logs',JSON.stringify(logs))}
+
+function load(){plans=JSON.parse(localStorage.getItem(P+'plans')||'[]');tasks=JSON.parse(localStorage.getItem(P+'tasks')||'[]');logs=JSON.parse(localStorage.getItem(P+'logs')||'[]')}
+
+function initSeed(){
+  if(localStorage.getItem(P+'inited')) return;
+  var n=new Date().toISOString(),t=n.split('T')[0],e=new Date(Date.now()+56*86400000).toISOString().split('T')[0];
+  var d=[{t:'📐 数学强化',d:'有理数运算→整式加减→一元一次方程→几何初步。每天20道计算题',s:'数学',c:'tag-math',k:[['上午：数学基础学习',90],['20道计算题',20],['晚上：数学强化训练+错题重做',90],['整理错题本',15]]},{t:'🔤 英语突破',d:'每天背15个新词+复习旧词。攻克音标，课文，语法',s:'英语',c:'tag-eng',k:[['早晨：英语晨读朗读20分钟',30],['背15个新单词+音标学习',45],['语法学习+造句练习',30],['晚上：单词滚动复习',30],['碎片时间：听力磨耳朵',15]]},{t:'📚 语文提升',d:'古诗文背诵默写，每天1篇阅读，每周1篇作文',s:'语文',c:'tag-chn',k:[['古诗文背诵默写',20],['现代文阅读1篇',30],['文言文翻译练习',20],['名著阅读30分钟',30]]},{t:'🧬 生物复习',d:'细胞结构、生态系统、人体各系统。画图理解',s:'生物',c:'tag-bio',k:[['生物课本复习画图理解',40],['整理知识点笔记',20]]},{t:'📖 小科轮换背诵',d:'周一四历史，周二五地理，周三六政治',s:'综合',c:'tag-other',k:[['小科轮换学习',45],['周六回顾+抽背',30]]},{t:'📝 每日必修习惯',d:'错题整理、当日复习、早睡早起',s:'综合',c:'tag-other',k:[['当日复习回顾所有科目',30],['背诵知识回顾',15],['晚9:30洗漱就寝',5],['晚10:00熄灯睡觉',5]]}];
+  d.forEach(function(p){
+    var pi=uid();plans.push({id:pi,title:p.t,desc:p.d,subject:p.s,color:p.c,start:t,end:e});
+    p.k.forEach(function(x,i){tasks.push({id:uid(),pid:pi,title:x[0],mins:x[1],sub:p.s,order:i})});
+  });
+  localStorage.setItem(P+'inited','1');save();
+}
+
+function today(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+
+function isActive(p){var td=today();return p.start<=td&&p.end>=td}
+
+function isDone(tid){var td=today();return logs.some(function(l){return l.tid===tid&&l.date===td})}
+
+function toggle(tid,pid){
+  var td=today();
+  if(isDone(tid)){logs=logs.filter(function(l){return!(l.tid===tid&&l.date===td)})}
+  else{logs.push({tid:tid,pid:pid,date:td})}
+  save();render();
+}
+
+function countToday(){var td=today(),total=0,done=0;plans.forEach(function(p){if(!isActive(p))return;tasks.filter(function(t){return t.pid===p.id}).forEach(function(t){total++;if(isDone(t.id))done++})});return{total:total,done:done}}
+
+function showTab(i){tab=i;document.querySelectorAll('.nav-item').forEach(function(el,idx){el.classList.toggle('active',idx===i)});render()}
+
+function render(){
+  load();
+  document.getElementById('date').textContent=new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+  var html='';
+  if(tab===0){
+    var c=countToday(),pct=c.total?Math.round(c.done/c.total*100):0;
+    html+='<div class="card"><div class="progress"><svg width="50" height="50"><circle cx="25" cy="25" r="20" fill="none" stroke="#e0e0e0" stroke-width="4"/><circle cx="25" cy="25" r="20" fill="none" stroke="'+(pct===100?'#4CAF50':'#4A90D9')+'" stroke-width="4" stroke-dasharray="'+pct*1.256+', 125.6" stroke-linecap="round" transform="rotate(-90,25,25)"/><text x="25" y="30" text-anchor="middle" font-size="12" font-weight="bold">'+pct+'%</text></svg><div><b>'+(pct===100?'🎉 全部完成！':'今日进度')+'</b><br><span style="font-size:13px;color:#999">已完成 '+c.done+' / '+c.total+' 项</span></div></div></div>';
+    var active=plans.filter(isActive);
+    if(!active.length) html+='<div style="text-align:center;padding:60px 20px;color:#999">🎉 所有计划已完成或已过期</div>';
+    active.forEach(function(p){
+      var pts=tasks.filter(function(t){return t.pid===p.id}),tdone=pts.filter(function(t){return isDone(t.id)}).length;
+      html+='<div class="card"><h3><span class="tag '+p.color+'">'+p.subject+'</span> '+p.title+' <span style="font-size:12px;color:#999;margin-left:auto">'+tdone+'/'+pts.length+'</span></h3>';
+      if(p.desc) html+='<div class="desc">'+p.desc+'</div>';
+      pts.forEach(function(t){var d=isDone(t.id);html+='<div class="task" onclick="toggle(\''+t.id+'\',\''+p.id+'\')"><input type="checkbox" '+(d?'checked':'')+'><span class="'+(d?'done':'')+'">'+t.title+'</span><span class="time">'+t.mins+'分钟</span></div>'});
+      html+='</div>';
+    });
+  }else{
+    var totalDone=logs.length,allTasks=tasks.length;
+    html+='<div class="stats-row"><div class="stats-card"><div class="num" style="color:#4A90D9">'+plans.length+'</div><div class="lbl">学习计划</div></div><div class="stats-card"><div class="num" style="color:#4CAF50">'+totalDone+'</div><div class="lbl">完成次数</div></div></div>';
+    html+='<div class="card"><h3 style="margin-bottom:12px">📋 所有计划</h3>';
+    plans.forEach(function(p){
+      var pts=tasks.filter(function(t){return t.pid===p.id});
+      html+='<div style="padding:8px 0;border-bottom:1px solid #f5f5f5"><b>'+p.title+'</b> <span class="tag '+p.color+'">'+p.subject+'</span><br><span style="font-size:12px;color:#999">'+pts.length+'个任务 | '+p.start+' ~ '+p.end+'</span></div>';
+    });
+    html+='</div>';
+  }
+  document.getElementById('content').innerHTML=html;
+}
+
+initSeed();load();render();
+</script>
+</body>
+</html>
